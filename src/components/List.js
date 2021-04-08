@@ -26,4 +26,11 @@ export default class List {
             if (task.id == taskID) return task;
         }
     }
+
+    getProperties() {
+        return {
+            id = this.id,
+            name = this.name.getValue()
+        }
+    }
 }

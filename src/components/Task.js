@@ -14,4 +14,13 @@ export default class Task {
         this.name = new BehaviorSubject(taskData.name);
         this.description = new BehaviorSubject(taskData.description);
     }
+
+    getProperties() {
+        return {
+            id = this.id,
+            list_id: this.list_id,
+            name: this.name.getValue(),
+            description: this.description.getValue()
+        }
+    }
 }
