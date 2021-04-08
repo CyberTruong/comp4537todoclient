@@ -5,14 +5,9 @@ import { NavigationContainer } from "@react-navigation/native";
 import HomeView from "./src/views/HomeView";
 import ListView from "./src/views/ListView";
 import TaskView from "./src/views/TaskView";
+import ROUTES from "./src/views/ROUTES";
 
 const Stack = createStackNavigator();
-
-const ROUTES = {
-    HOME: "Home",
-    LIST: "List",
-    TASK: "Task",
-};
 
 const styles = StyleSheet.create({
     container: {
@@ -24,9 +19,21 @@ export default function App() {
     return (
         <NavigationContainer>
             <Stack.Navigator initialRouteName={ROUTES.HOME}>
-                <Stack.Screen name={ROUTES.HOME} component={HomeView} />
-                <Stack.Screen name={ROUTES.LIST} component={ListView} />
-                <Stack.Screen name={ROUTES.TASK} component={TaskView} />
+                <Stack.Screen
+                    name={ROUTES.HOME}
+                    component={HomeView}
+                    options={{ title: "To Do Lists" }}
+                />
+                <Stack.Screen
+                    name={ROUTES.LIST}
+                    component={ListView}
+                    options={{ title: "Tasks" }}
+                />
+                <Stack.Screen
+                    name={ROUTES.TASK}
+                    component={TaskView}
+                    options={{ title: "Task Details" }}
+                />
             </Stack.Navigator>
         </NavigationContainer>
     );

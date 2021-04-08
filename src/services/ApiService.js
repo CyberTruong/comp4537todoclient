@@ -5,46 +5,46 @@ export default class APIService {
     /**
      * Gets all lists in the database.
      */
-    async getLists() {}
+    static async getLists() {}
 
     /**
      * Creates a new list in the database.
      */
-    async createList() {}
+    static async createList() {}
 
     /**
      * Updates a list.
      * @param {List} list List object that holds the new updates.
      */
-    async updateList(list) {}
+    static async updateList(list) {}
 
     /**
      * Deletes a list.
      * @param {List} list List object that holds the id needed to delete the list.
      */
-    async deleteList(list) {}
+    static async deleteList(list) {}
 
     /**
      * Gets all tasks based on the list.
      * @param {List} list List object that holds the id needed to fetch tasks.
      */
-    async getTasks(list) {}
+    static async getTasks(list) {}
 
     /**
      * Creates an empty new task in the specified list.
      * @param {List} list
      */
-    async createTask(list) {}
+    static async createTask(list) {}
 
     /**
      * Updates specified task.
      * @param {Task} task The task instance to be updated
      */
-    async updateTask(task) {}
+    static async updateTask(task) {}
 
     /**
      * Deletes the specified task.
      * @param {Task} task
      */
-    async deleteTask(task) {}
+    static async deleteTask(task) {}
 }
