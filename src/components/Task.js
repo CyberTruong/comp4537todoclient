@@ -17,10 +17,10 @@ export default class Task {
 
     getProperties() {
         return {
-            id = this.id,
+            id: this.id,
             list_id: this.list_id,
             name: this.name.getValue(),
-            description: this.description.getValue()
-        }
+            description: this.description.getValue(),
+        };
     }
 }

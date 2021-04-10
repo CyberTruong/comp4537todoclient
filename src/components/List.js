@@ -29,8 +29,8 @@ export default class List {
 
     getProperties() {
         return {
-            id = this.id,
-            name = this.name.getValue()
-        }
+            id: this.id,
+            name: this.name.getValue(),
+        };
     }
 }
