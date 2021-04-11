@@ -22,7 +22,6 @@ if (process.env.NODE_ENV == "production") {
         httpsServer.listen(httpsPort);
     } catch (error) {
         console.log(error.message);
-        dbconnection.end();
     }
 } else {
     try {
@@ -30,6 +29,5 @@ if (process.env.NODE_ENV == "production") {
         httpServer.listen(httpPort);
     } catch (error) {
         console.log(error.message);
-        dbconnection.end();
     }
 }
