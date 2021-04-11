@@ -11,6 +11,12 @@ const credentials = require("./modules/ssl");
 const httpPort = process.env.HTTP_PORT || 80;
 const httpsPort = process.env.HTTPS_PORT || 443;
 
+app.use(express.static(path.join(__dirname, "web-build")));
+
+app.get("*", (req, res, next) => {
+    res.sendFile(path.join(__dirname, "/web-build/index.html"));
+});
+
 /**
  * Server Initialization
  */
