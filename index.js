@@ -1,7 +1,8 @@
 require("dotenv").config();
 const http = require("http");
 const https = require("https");
-const app = require("express")();
+const express = require("express");
+const app = express();
 const redirectApp = require("./modules/redirectapp.js");
 const credentials = require("./modules/ssl");
 
