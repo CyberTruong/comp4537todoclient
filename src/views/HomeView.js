@@ -1,21 +1,25 @@
 import React from "react";
-import { FlatList } from "react-native";
+import { FlatList, Button, Text } from "react-native";
 import { ListItem } from "react-native-elements";
 import Lists from "../components/Lists";
 import { useNavigation } from "@react-navigation/native";
 import ROUTES from "./ROUTES";
 import { View } from "react-native";
-import { Button } from "react-native-elements";
-import APIService from "../services/ApiService";
 
 export default function HomeView() {
     const navigation = useNavigation();
 
-    const [lists, setLists] = React.useState(Lists.lists);
+    const [lists, setLists] = React.useState(Lists.lists.getValue());
+    const [status, setStatus] = React.useState("");
+    const [extraData, setExtraData] = React.useState(null);
 
     React.useEffect(() => {
         const listsSubscription = Lists.lists.subscribe((lists) => {
             setLists(lists);
+        });
+
+        navigation.addListener("focus", () => {
+            setExtraData(null);
         });
 
         return () => {
@@ -23,20 +27,39 @@ export default function HomeView() {
         };
     }, []);
 
+    React.useEffect(() => {
+        try {
+            Lists.getLists();
+        } catch (error) {
+            setStatus(error.message);
+        }
+    }, []);
+
+    async function createList() {
+        try {
+            await Lists.createList();
+            setStatus("Success!");
+        } catch (error) {
+            setStatus(error.message);
+        }
+    }
+
+    function listItemOnPress(item) {
+        setExtraData(item);
+        navigation.navigate(ROUTES.LIST, {
+            listID: item.id,
+        });
+    }
+
     return (
         <View>
-            <Button title="NEW LIST" onPress={() => APIService.createList()} />
+
             <FlatList
+                extraData={extraData}
                 data={lists}
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item }) => (
-                    <ListItem
-                        onPress={() =>
-                            navigation.navigate(ROUTES.LIST, {
-                                listID: item.id,
-                            })
-                        }
-                    >
+                    <ListItem onPress={() => listItemOnPress(item)}>
                         <ListItem.Content>
                             <ListItem.Title>
                                 {item.name.getValue()}
@@ -48,6 +71,8 @@ export default function HomeView() {
                     </ListItem>
                 )}
             />
+            <Button title="NEW LIST" onPress={() => createList()} />
+            <Text h5>STATUS: {status}</Text>
         </View>
     );
 }

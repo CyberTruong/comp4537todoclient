@@ -1,5 +1,6 @@
 import { BehaviorSubject } from "rxjs";
 import Task from "./Task";
+import APIService from "../services/ApiService";
 
 /**
  * Represents a list that holds tasks.
@@ -10,21 +11,17 @@ export default class List {
      */
     constructor(listData) {
         this.id = listData.id;
-        this.name = new BehaviorSubject(listData.name);
-        this.tasks = new BehaviorSubject([
-            new Task({
-                id: 1,
-                list_id: 1,
-                name: "Test Task",
-                description: "sadfdsa",
-            }),
-        ]);
+        this.name = new BehaviorSubject(
+            listData.name ? listData.name : "New List"
+        );
+        this.tasks = new BehaviorSubject([]);
     }
 
     getTaskByID(taskID) {
-        for (let task of this.tasks.getValue()) {
-            if (task.id == taskID) return task;
-        }
+        const result = this.tasks
+            .getValue()
+            .filter((task) => task.id == taskID);
+        if (result) return result[0];
     }
 
     getProperties() {
@@ -32,5 +29,25 @@ export default class List {
             id: this.id,
             name: this.name.getValue(),
         };
+    }
+
+    async updateList() {
+        await APIService.updateList(this);
+    }
+
+    async getTasks() {
+        this.tasks.next([]);
+        const tasksData = await APIService.getTasks(this);
+        if (tasksData) this.tasks.next(tasksData.map((task) => new Task(task)));
+    }
+
+    async createTask() {
+        await APIService.createTask(this);
+        this.getTasks();
+    }
+
+    async deleteTask(task) {
+        await APIService.deleteTask(task);
+        this.getTasks();
     }
 }

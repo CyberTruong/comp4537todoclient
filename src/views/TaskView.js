@@ -2,9 +2,8 @@ import React from "react";
 import { View } from "react-native";
 import Lists from "../components/Lists";
 import { Text, Input, Button } from "react-native-elements";
-import ApiService from "../services/ApiService";
 
-export default function TaskView({ route }) {
+export default function TaskView({ route, navigation }) {
     const list = Lists.getListByID(route.params.list_id);
     const task = list.getTaskByID(route.params.id);
 
@@ -12,6 +11,7 @@ export default function TaskView({ route }) {
     const [description, setDescription] = React.useState(
         task.description.getValue()
     );
+    const [status, setStatus] = React.useState("");
 
     React.useEffect(() => {
         const nameSubscription = task.name.subscribe((name) => setName(name));
@@ -24,6 +24,24 @@ export default function TaskView({ route }) {
             descriptionSubscription.unsubscribe();
         };
     }, []);
+
+    async function updateTask(task) {
+        try {
+            await task.updateTask(task);
+            setStatus("Success!");
+        } catch (error) {
+            setStatus(error.message);
+        }
+    }
+
+    async function deleteTask(task) {
+        try {
+            await list.deleteTask(task);
+            navigation.goBack();
+        } catch (error) {
+            setStatus(error.message);
+        }
+    }
 
     return (
         <View>
@@ -40,15 +58,13 @@ export default function TaskView({ route }) {
                 value={description}
                 onChangeText={(text) => task.description.next(text)}
             />
-            <Button
-                title={"UPDATE TASK"}
-                onPress={() => ApiService.updateTask(task)}
-            />
+            <Button title={"UPDATE TASK"} onPress={() => updateTask(task)} />
             <Button
                 type={"outline"}
                 title={"DELETE TASK"}
-                onPress={() => ApiService.deleteTask(task)}
+                onPress={() => deleteTask(task)}
             />
+            <Text h4>STATUS: {status}</Text>
         </View>
     );
 }

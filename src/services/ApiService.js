@@ -2,11 +2,16 @@
  * Handles API calls.
  */
 export default class APIService {
-    static APIRoot = "ktruong.net:3002";
+    static APIRoot = "https://ktruong.net:3002/API/v1";
+
+    static token = null;
 
     static APIEndPoints = {
-        LIST: this.APIRoot + `/lists`,
-        TASK: this.APIRoot + `/tasks`,
+        AUTH: this.APIRoot + `/auth`,
+        LISTS: this.APIRoot + `/lists`,
+        LIST: this.APIRoot + `/list`,
+        TASKS: this.APIRoot + `/tasks`,
+        TASK: this.APIRoot + `/task`,
     };
 
     static METHODS = {
@@ -16,44 +21,64 @@ export default class APIService {
         DELETE: "DELETE",
     };
 
+    static async authenticate(username, password) {
+        try {
+            const response = await fetch(this.APIEndPoints.AUTH, {
+                method: this.METHODS.POST,
+                mode: "cors",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password,
+                }),
+            });
+            if (response.ok) {
+                const token = await response.json();
+                this.token = token;
+                return token;
+            }
+            throw new Error(response.status);
+        } catch (error) {
+            throw error;
+        }
+    }
+
     /**
      * Gets all lists in the database.
      */
     static async getLists() {
-        try {
-            const response = await fetch(this.APIEndPoints.LIST, {
-                method: this.METHODS.GET,
-                mode: "cors",
-                headers: {
-                    "Content-Type": "application.json",
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
-            });
-            if (response.ok) return await response.json();
-            console.log(response.status);
-        } catch (error) {
-            console.log(error.messages);
-        }
+        const response = await fetch(this.APIEndPoints.LISTS, {
+            method: this.METHODS.POST,
+            mode: "cors",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                token: this.token,
+            }),
+        });
+        if (response.ok) return JSON.parse(await response.json());
+        throw new Error(response.status);
     }
 
     /**
      * Creates a new list in the database.
      */
     static async createList() {
-        try {
-            const response = await fetch(this.APIEndPoints.LIST, {
-                method: this.METHODS.POST,
-                mode: "cors",
-                headers: {
-                    "Content-Type": "application.json",
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
-            });
+        const response = await fetch(this.APIEndPoints.LIST, {
+            method: this.METHODS.POST,
+            mode: "cors",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                token: this.token,
+            }),
+        });
 
-            return response.ok;
-        } catch (error) {
-            console.log(error.messages);
-        }
+        if (!response.ok) throw new Error(response.status);
     }
 
     /**
@@ -61,24 +86,19 @@ export default class APIService {
      * @param {List} list List object that holds the new updates.
      */
     static async updateList(list) {
-        try {
-            const response = await fetch(
-                this.APIEndPoints.LIST + `/${list.id}`,
-                {
-                    method: this.METHODS.PUT,
-                    mode: "cors",
-                    headers: {
-                        "Content-Type": "application.json",
-                        "Content-Type": "application/x-www-form-urlencoded",
-                    },
-                    body: JSON.stringify(list.getProperties()),
-                }
-            );
+        const response = await fetch(this.APIEndPoints.LIST + `/${list.id}`, {
+            method: this.METHODS.PUT,
+            mode: "cors",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                token: this.token,
+                ...list.getProperties(),
+            }),
+        });
 
-            return response.ok;
-        } catch (error) {
-            console.log(error.messages);
-        }
+        if (!response.ok) throw new Error(response.status);
     }
 
     /**
@@ -86,23 +106,18 @@ export default class APIService {
      * @param {List} list List object that holds the id needed to delete the list.
      */
     static async deleteList(list) {
-        try {
-            const response = await fetch(
-                this.APIEndPoints.LIST + `/${list.id}`,
-                {
-                    method: this.METHODS.DELETE,
-                    mode: "cors",
-                    headers: {
-                        "Content-Type": "application.json",
-                        "Content-Type": "application/x-www-form-urlencoded",
-                    },
-                }
-            );
+        const response = await fetch(this.APIEndPoints.LIST + `/${list.id}`, {
+            method: this.METHODS.DELETE,
+            mode: "cors",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                token: this.token,
+            }),
+        });
 
-            return response.ok;
-        } catch (error) {
-            console.log(error.messages);
-        }
+        if (!response.ok) throw new Error(response.status);
     }
 
     /**
@@ -110,25 +125,21 @@ export default class APIService {
      * @param {List} list List object that holds the id needed to fetch tasks.
      */
     static async getTasks(list) {
-        try {
-            const response = await fetch(
-                this.APIEndPoints.TASK + `/${list.id}`,
-                {
-                    method: this.METHODS.GET,
-                    mode: "cors",
-                    headers: {
-                        "Content-Type": "application.json",
-                        "Content-Type": "application/x-www-form-urlencoded",
-                    },
-                }
-            );
+        const response = await fetch(this.APIEndPoints.TASKS + `/${list.id}`, {
+            method: this.METHODS.POST,
+            mode: "cors",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                token: this.token,
+            }),
+        });
 
-            if (response.ok) return await response.json();
+        const body = await response.json();
 
-            console.log(response.ok);
-        } catch (error) {
-            console.log(error.messages);
-        }
+        if (response.ok) return body;
+        throw new Error(response.status);
     }
 
     /**
@@ -136,23 +147,18 @@ export default class APIService {
      * @param {List} list
      */
     static async createTask(list) {
-        try {
-            const response = await fetch(
-                this.APIEndPoints.TASK + `/${list.id}`,
-                {
-                    method: this.METHODS.POST,
-                    mode: "cors",
-                    headers: {
-                        "Content-Type": "application.json",
-                        "Content-Type": "application/x-www-form-urlencoded",
-                    },
-                }
-            );
+        const response = await fetch(this.APIEndPoints.TASK + `/${list.id}`, {
+            method: this.METHODS.POST,
+            mode: "cors",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                token: this.token,
+            }),
+        });
 
-            return response.ok;
-        } catch (error) {
-            console.log(error.messages);
-        }
+        if (!response.ok) throw new Error(response.status);
     }
 
     /**
@@ -160,24 +166,19 @@ export default class APIService {
      * @param {Task} task The task instance to be updated
      */
     static async updateTask(task) {
-        try {
-            const response = await fetch(
-                this.APIEndPoints.TASK + `/${task.id}`,
-                {
-                    method: this.METHODS.PUT,
-                    mode: "cors",
-                    headers: {
-                        "Content-Type": "application.json",
-                        "Content-Type": "application/x-www-form-urlencoded",
-                    },
-                    body: JSON.stringify(task.getProperties()),
-                }
-            );
+        const response = await fetch(this.APIEndPoints.TASK + `/${task.id}`, {
+            method: this.METHODS.PUT,
+            mode: "cors",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                token: this.token,
+                ...task.getProperties(),
+            }),
+        });
 
-            console.log(response.ok);
-        } catch (error) {
-            console.log(error.messages);
-        }
+        if (!response.ok) throw new Error(response.status);
     }
 
     /**
@@ -185,22 +186,17 @@ export default class APIService {
      * @param {Task} task
      */
     static async deleteTask(task) {
-        try {
-            const response = await fetch(
-                this.APIEndPoints.TASK + `/${task.id}`,
-                {
-                    method: this.METHODS.DELETE,
-                    mode: "cors",
-                    headers: {
-                        "Content-Type": "application.json",
-                        "Content-Type": "application/x-www-form-urlencoded",
-                    },
-                }
-            );
+        const response = await fetch(this.APIEndPoints.TASK + `/${task.id}`, {
+            method: this.METHODS.DELETE,
+            mode: "cors",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                token: this.token,
+            }),
+        });
 
-            return response.ok;
-        } catch (error) {
-            console.log(error.messages);
-        }
+        if (!response.ok) throw new Error(response.status);
     }
 }
