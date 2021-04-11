@@ -16,7 +16,8 @@ const httpsPort = process.env.HTTPS_PORT || 443;
 app.use(express.static(path.join(__dirname, "/web-build")));
 
 app.get("/", (req, res, next) => {
-    res.sendFile(path.join(__dirname, "/web-build/index.html"));
+        console.log("this ran");
+	res.sendFile(path.join(__dirname, "/web-build/index.html"));
 });
 
 /**
@@ -26,8 +27,12 @@ if (process.env.NODE_ENV == "production") {
     try {
         const httpServer = http.createServer(redirectApp);
         const httpsServer = https.createServer(credentials, app);
-        httpServer.listen(httpPort);
-        httpsServer.listen(httpsPort);
+        httpServer.listen(httpPort, () => {
+	        console.log("http server listening");
+	});
+        httpsServer.listen(httpsPort, () => {
+	        console.log("https server listening");
+	});
     } catch (error) {
         console.log(error.message);
     }
